@@ -1,0 +1,6 @@
+---
+ title: "Estadistica"
+ author: "ushuni"
+ date: "2023-05-15"
+ output: html_document
+---
