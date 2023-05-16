@@ -14,7 +14,7 @@ ruta_datos <- "C:\\Users\\Windows 10\\Desktop\\PROYECTO\\proyecto.io\\Datos\\202
 #viendo los datos
 excel_sheets(ruta_datos)
 #importando datos del caso 2020
-datos_2020 <- read_excel(ruta_datos, sheet = "2020-Apertura")
+datos_2020 <- read_excel(ruta_datos, sheet = "Sheet1")
 #asignando
 datos<- data.frame(datos_2020)
 datos
@@ -58,9 +58,9 @@ actualizar_puntuaciones_elo <- function(puntuaciones_elo, expectativa, resultado
 }
 
 # Ejemplo de actualización de puntuaciones después de un partido
-equipo_a <- "Bolivar"
-equipo_b <- "Aurora"
-resultado_partido <- 0  # 1 para victoria del Equipo A, 0.5 para empate, 0 para victoria del Equipo B
+equipo_a <- "Royal Pari"
+equipo_b <- "Blooming"
+resultado_partido <- 1  # 1 para victoria del Equipo A, 0.5 para empate, 0 para victoria del Equipo B
 
 # Obtener las puntuaciones Elo de los equipos desde la base de datos
 puntuacion_elo_a <- datos$PtsELO[datos$Equipo == equipo_a]
@@ -98,4 +98,9 @@ datos_actualizados$PtsELO[datos_actualizados$Equipo == equipo_b] <- nueva_puntua
 
 # Guardar el dataframe actualizado en un nuevo archivo Excel
 write_xlsx(datos_actualizados, "C:\\Users\\Windows 10\\Desktop\\PROYECTO\\proyecto.io\\Datos\\2020-Apertura.xlsx")
+
+
+#para git
+#git config user.email "nigomi.34@gmail.com"
+#git config user.name "Ushuni"
 

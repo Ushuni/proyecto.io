@@ -1,0 +1,24 @@
+---
+title: "Modelo ELO"
+author: "ushuni"
+date: "2023-05-16"
+output: html_document
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```{r}
+#con el modelo ELo
+# Cargar la biblioteca ggplot2
+library(ggplot2)
+
+# Crear un dataframe con los equipos y sus puntuaciones Elo
+equipos <- c("Bolivar", "Aurora", "The Strongest", "Wilstermann", "Oriente Petrolero")
+puntuaciones <- c(1500, 1400, 1600, 1550, 1450)
+datos <- data.frame(Equipo = equipos, Puntuacion = puntuaciones)
+
+# Crear el gráfico de barras
+ggplot(datos, aes(x = Equipo, y = Puntuacion, fill = Equipo)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Puntuaciones Elo de los equipos", x = "Equipo", y = "Puntuación Elo") +
+  theme_minimal()
+
