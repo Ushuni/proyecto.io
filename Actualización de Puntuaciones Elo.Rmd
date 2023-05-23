@@ -1,0 +1,52 @@
+---
+title: "Actualización de Puntuaciones Elo"
+author: "ushuni"
+date: "2023-05-23"
+output: html_document
+---
+
+```{r, echo=FALSE}
+# Cargar paquetes y establecer la conexión a la base de datos
+library(DBI)
+library(RMySQL)
+
+con <- dbConnect(RMySQL::MySQL(),
+                 dbname = "DBRedDeportivaELO",
+                 host = "localhost",
+                 port = 3306,
+                 user = "root",
+                 password = "ushuni")
+
+# Código para la interfaz de usuario
+sidebarLayout(
+  sidebarPanel(
+    selectInput("equipo_a", "Equipo A:", choices = dbGetQuery(con, "SELECT nombre FROM Tequipos")),
+    selectInput("equipo_b", "Equipo B:", choices = dbGetQuery(con, "SELECT nombre FROM Tequipos")),
+    numericInput("resultado", "Resultado:", min = 0, max = 1, value = 0.5, step = 0.5),
+    actionButton("actualizar", "Actualizar Puntuaciones Elo")
+  ),
+  
+  mainPanel(
+    tableOutput("puntuaciones_elo")
+  )
+)
+# Código para el servidor de Shiny
+server <- function(input, output, session) {
+  # Actualizar las puntuaciones Elo cuando se haga clic en el botón "Actualizar"
+  observeEvent(input$actualizar, {
+    equipo_a <- input$equipo_a
+    equipo_b <- input$equipo_b
+    resultado <- input$resultado
+    
+    # Realizar los cálculos y actualizaciones en la base de datos
+    # ...
+    
+    # Obtener las puntuaciones Elo actualizadas
+    puntuaciones_elo <- dbGetQuery(con, "SELECT * FROM Tpuntuaciones")
+    
+    # Mostrar las puntuaciones Elo actualizadas
+    output$puntuaciones_elo <- renderTable(puntuaciones_elo)
+  })
+}
+
+shinyApp(ui = sidebarLayout(), server = server)

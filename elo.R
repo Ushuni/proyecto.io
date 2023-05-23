@@ -79,11 +79,8 @@ nueva_puntuacion_elo_b <- actualizar_puntuaciones_elo(puntuacion_elo_b, expectat
 datos$PtsELO[datos$Equipo == equipo_a] <- nueva_puntuacion_elo_a
 datos$PtsELO[datos$Equipo == equipo_b] <- nueva_puntuacion_elo_b
 datos
-#typeof(nueva_puntuacion_elo_a)
-#typeof(nueva_puntuacion_elo_b)
-#typeof(resultado_partido)
 
-#typeof(equipo_a)
+
 # Mostrar las puntuaciones Elo actualizadas
 print(datos)
 
