@@ -21,7 +21,7 @@ datos
 Equipo<- datos_2020$Equipo
 partidoJugados<- datos$PG
 partidosGanados<-datos$G
-partidosEmpatados<-datos$E
+partidosEmpatados<-datos$E   
 partidosPerdidos<-datos$P
 puntosEquipo<-datos$Pts
 PtsELO<-datos$PtsELO

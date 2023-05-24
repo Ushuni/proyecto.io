@@ -5,6 +5,7 @@ date: "2023-05-23"
 output: html_document
 ---
 
+
 ```{r, echo=FALSE}
 # Cargar paquetes y establecer la conexión a la base de datos
 library(DBI)
