@@ -4,6 +4,9 @@ library(RMySQL)
 library(ggplot2)
 library(plotly)
 library(magrittr)
+library(shiny)
+library(shinyjs)
+
 
 # Cerrar todas las conexiones a la base de datos
 conns <- dbListConnections(drv = RMySQL::MySQL())
@@ -29,6 +32,7 @@ actualizar_puntuaciones_elo <- function(puntuaciones_elo, expectativa, resultado
 
 # Definir la interfaz de la aplicación
 ui <- fluidPage(
+  useShinyjs(),  # Cargar shinyjs
   tags$head(
     tags$style(
       HTML(
@@ -57,6 +61,16 @@ ui <- fluidPage(
           border-radius: 4px;
           border: none;
         }
+        
+        .btn-redireccionar {
+  background-color: #28a745;
+  color: #fff;
+  font-weight: bold;
+  padding: 8px 16px;
+  border-radius: 4px;
+  border: none;
+  margin-top: 10px;
+}
 
         .tabla-resultados {
           margin-top: 20px;
@@ -79,7 +93,10 @@ ui <- fluidPage(
         selectInput("resultado", "Resultado:",
                     choices = c("Ganó A", "Empate", "Ganó B")),
         actionButton("calcular", "Calcular", class = "btn-calcular"),
-        actionButton("cerrar", "Cerrar", class = "btn-cerrar")
+        actionButton("cerrar", "Cerrar", class = "btn-cerrar"),
+        actionButton("redireccionar", "Redireccionar", class = "btn-redireccionar")
+        
+        
       )
     ),
     mainPanel(
@@ -153,6 +170,12 @@ server <- function(input, output, session) {
   # Lógica para cerrar la aplicación
   observeEvent(input$cerrar, {
     stopApp()
+  })
+  observeEvent(input$redireccionar, {
+    runjs("window.location.href = 'C:\\Users\\Windows 10\\Desktop\\PROYECTO\\proyecto.io\\appPredic.R'")
+  
+  
+    
   })
   # Mostrar la tabla de los resultados
   output$tabla_resultados <- renderTable({
