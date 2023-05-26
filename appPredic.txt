@@ -1,9 +1,9 @@
 library(shiny)
-library(shinythemes)
 library(DBI)
 library(RMySQL)
 library(ggplot2)
 library(dplyr)
+
 
 con <- dbConnect(RMySQL::MySQL(), dbname = "DBRedDeportivaELO",
                  host = "localhost", port = 3306,
@@ -17,17 +17,15 @@ calcular_expectativas <- function(puntuaciones_elo1, puntuaciones_elo2) {
 predecir_ganador <- function(puntuaciones_elo_a, puntuaciones_elo_b) {
   expectativa <- calcular_expectativas(puntuaciones_elo_a, puntuaciones_elo_b)
   if (expectativa > 0.5) {
-    return("Ganó Equipo Local")
+    return("Ganó A")
   } else if (expectativa < 0.5) {
-    return("Ganó Equipo Visitante")
+    return("Ganó B")
   } else {
     return("Empate")
   }
 }
 
 ui <- fluidPage(
-  theme = shinytheme("flatly"),
-  
   tags$head(
     tags$style(HTML(
       "
@@ -76,13 +74,11 @@ ui <- fluidPage(
   sidebarLayout(
     sidebarPanel(
       tags$div(class = "container",
-               selectInput("equipo_a", "Equipo Local:", choices = NULL),
-               selectInput("equipo_b", "Equipo Visitante:", choices = NULL),
+               selectInput("equipo_a", "Equipo A:", choices = NULL),
+               selectInput("equipo_b", "Equipo B:", choices = NULL),
                actionButton("predict_button", "Predecir ganador", class = "predict-button"),
-               div(class = "well",
-                   h4("Resultado:", class = "result"),
-                   div(plotOutput("expectativas_plot", height = "300px"), class = "plot-wrapper")
-               )
+               h4("Resultado:", class = "result"),
+               div(plotOutput("expectativas_plot", height = "300px"), class = "plot-wrapper")
       )
     ),
     
@@ -116,12 +112,9 @@ server <- function(input, output, session) {
       resultado
     })
     
-    expectativa_a <- calcular_expectativas(puntuacion_elo_a, puntuacion_elo_b)
-    expectativa_b <- calcular_expectativas(puntuacion_elo_b, puntuacion_elo_a)
-    
     data <- data.frame(Equipo = c(equipo_a, equipo_b),
-                       Expectativa = c(expectativa_a, expectativa_b),
-                       Probabilidad = c(paste0(round(expectativa_a * 100, 1), "%"), paste0(round(expectativa_b * 100, 1), "%")))
+                       Expectativa = c(calcular_expectativas(puntuacion_elo_a, puntuacion_elo_b),
+                                       calcular_expectativas(puntuacion_elo_b, puntuacion_elo_a)))
     
     output$expectativas_plot <- renderPlot({
       ggplot(data, aes(x = "", y = Expectativa, fill = Equipo)) +
@@ -132,8 +125,7 @@ server <- function(input, output, session) {
              y = NULL,
              fill = NULL) +
         theme_void() +
-        theme(plot.title = element_text(hjust = 0.5)) +
-        geom_text(aes(label = Probabilidad), position = position_stack(vjust = 0.5), color = "black", size = 4)
+        theme(plot.title = element_text(hjust = 0.5))
     })
   })
 }

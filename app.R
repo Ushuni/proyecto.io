@@ -88,10 +88,10 @@ ui <- fluidPage(
     sidebarPanel(
       tags$div(
         class = "sidebar-panel",
-        selectInput("equipo_a", "Equipo A:", choices = NULL),
-        selectInput("equipo_b", "Equipo B:", choices = NULL),
+        selectInput("equipo_a", "Equipo Local:", choices = NULL),
+        selectInput("equipo_b", "Equipo Visitante:", choices = NULL),
         selectInput("resultado", "Resultado:",
-                    choices = c("Ganó A", "Empate", "Ganó B")),
+                    choices = c("Ganó Equipo Local", "Empate", "Ganó Equipo Visitante")),
         actionButton("calcular", "Calcular", class = "btn-calcular"),
         actionButton("cerrar", "Cerrar", class = "btn-cerrar"),
         actionButton("redireccionar", "Redireccionar", class = "btn-redireccionar")
@@ -130,9 +130,9 @@ server <- function(input, output, session) {
     equipo_a <- input$equipo_a
     equipo_b <- input$equipo_b
     resultado <- switch(input$resultado,
-                        "Ganó A" = 1,
+                        "Ganó Equipo Local" = 1,
                         "Empate" = 0.5,
-                        "Ganó B" = 0)
+                        "Ganó Equipo Visitante" = 0)
     
     puntuacion_elo_a_val <- dbGetQuery(con, paste0("SELECT puntuacion_elo FROM Tclasificadores_elo WHERE equipo_id = (SELECT id_equipo FROM Tequipos WHERE nombre = '", equipo_a, "')"))
     puntuacion_elo_b_val <- dbGetQuery(con, paste0("SELECT puntuacion_elo FROM Tclasificadores_elo WHERE equipo_id = (SELECT id_equipo FROM Tequipos WHERE nombre = '", equipo_b, "')"))
@@ -187,53 +187,57 @@ server <- function(input, output, session) {
   
   # Mostrar la gráfica de los resultados en barras
   output$grafica_barras <- renderPlot({
-    df <- data.frame(
-      Equipo = c(input$equipo_a, input$equipo_b,puntuaciones_elo_todos$nombre),
-      Puntuacion_Elo = c(puntuacion_elo_a(), puntuacion_elo_b(),puntuaciones_elo_todos$puntuaciones_elo)
-    )
+    df <- subset(puntuaciones_elo_todos, !nombre %in% c(input$equipo_a, input$equipo_b))
+    df <- rbind(df, data.frame(nombre = c(input$equipo_a, input$equipo_b),
+                               puntuacion_elo = c(puntuacion_elo_a(), puntuacion_elo_b())))
     
-    porcentajes <- round(df$Puntuacion_Elo * 100, 1)
+    #porcentajes <- round(df$puntuacion_elo * 100, 1)
+    porcentajes <- scales::percent(df$Puntuacion_Elo, accuracy = 0.1)
     
-    p <- ggplot(df, aes(x = Equipo, y = Puntuacion_Elo)) +
+    p <- ggplot(df, aes(x = nombre, y = puntuacion_elo)) +
       geom_bar(stat = "identity", fill = "steelblue") +
-      geom_text(aes(label = paste0(porcentajes, "%")), vjust = -0.5) +
+      geom_text(aes(label = puntuacion_elo), vjust = -0.5, size = 3) +
       labs(title = "Puntuaciones Elo actualizadas",
            x = "Equipo", y = "Puntuación Elo") +
       theme_minimal()
     
+    
+    
+    
+    
+    
     p <- p + theme(
       plot.title = element_text(size = 20, face = "bold", hjust = 0.5, margin = margin(b = 20)),
-      axis.text = element_text(size = 12),
+      axis.text = element_text(angle=45, hjust=1,size = 12),
       axis.title = element_text(size = 14),
       axis.title.y = element_text(margin = margin(r = 10)),
       panel.grid.major.y = element_blank(),
       panel.border = element_blank(),
-      panel.background = element_blank()
+      panel.background = element_blank(),
+      plot.margin = margin(10, 80, 10, 10)  # Ajusta los márgenes del gráfico
     )
-    p
     
+    p
   })
+  
+  
   
   # Mostrar la gráfica estadística circular
   output$grafica_resultados <- renderPlotly({  # Cambio: Utilizar renderPlotly en lugar de renderPlot
     df <- data.frame(
       Equipo = c(input$equipo_a, input$equipo_b,puntuaciones_elo_todos$nombre),
-      Puntuacion_Elo = c(puntuacion_elo_a(), puntuacion_elo_b(),puntuaciones_elo_todos$puntuaciones_elo)
+      Puntuacion_Elo = c(puntuacion_elo_a(), puntuacion_elo_b(),puntuaciones_elo_todos$puntuacion_elo)
     )
     
-    p <- plot_ly(df, labels = df$Equipo, values = df$Puntuacion_Elo, type = "pie") %>%
-      layout(title = "Puntuaciones Elo actualizadas",
-             showlegend = FALSE,
-             xaxis = list(showticklabels = FALSE),
-             yaxis = list(showticklabels = FALSE))
-    
+    p <- plot_ly(df, labels = df$Equipo, values = df$Puntuacion_Elo, type = "pie")
+    p <- p %>% layout(title = "Puntuaciones Elo actualizadas")  # Cambio: Utilizar layout en lugar de add_layout
     p
   
   
   
 })
   
-  
+
   
   
   session$onSessionEnded(function() {
