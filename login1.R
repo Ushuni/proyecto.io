@@ -1,7 +1,7 @@
 library(RMySQL)
 library(shiny)
 library(shinyjs)
-dbDisconnect(con)
+
 # Definir la interfaz de usuario
 ui <- fluidPage(
   useShinyjs(),  # Importante: utilizar shinyjs
@@ -26,10 +26,10 @@ ui <- fluidPage(
           conditionalPanel(
             condition = "input.createUserButton > 0 && input.saveUserButton == 0",  # Mostrar campos de creación de usuario antes de guardar
             tags$h2("Crear nuevo usuario"),
-            textInput("newUsername", "Nuevo nombre de usuario"),
-            textInput("newEmail", "Nuevo email"),
+            textInput("newUsername", "Nuevo nombre de usuario",placeholder = "Nuevo nombre de usuario. Ej. FranCru"),
+            textInput("newEmail", "Nuevo email",placeholder = "Nuevo email Ej. juan@gmail.com"),
             selectInput("newTipo", "Tipo de nuevo usuario", choices = c("analista", "periodista")),  # Campo de selección para el tipo de usuario
-            passwordInput("newPassword", "Nueva contraseña"),
+            passwordInput("newPassword", "Nueva contraseña", placeholder = "Nueva contraseña"),
             actionButton("saveUserButton", "Guardar usuario"),
             htmlOutput("userStatus")  # Mostrar mensaje de estado para el nuevo usuario
           ),
@@ -68,6 +68,8 @@ server <- function(input, output, session) {
     if (nrow(result) > 0) {
       # Establecer el valor de loggedIn a TRUE
       loggedIn(TRUE)
+      # Mostrar mensaje de inicio exitoso
+      updateLoginStatus("Inicio de sesión exitoso")
     } else {
       updateLoginStatus("Usuario o contraseña incorrectos")
     }
