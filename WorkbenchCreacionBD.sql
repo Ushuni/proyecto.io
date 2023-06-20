@@ -37,6 +37,9 @@ CREATE TABLE Tusuarios (
   password VARCHAR(50) NOT NULL,
   FOREIGN KEY (id_rol) REFERENCES Troles(id_rol)
 );
+select *  from Tusuarios;
+
+
 -- Tabla periodistas
 CREATE TABLE Tperiodistas (
   id_periodista INT PRIMARY KEY AUTO_INCREMENT,
@@ -93,6 +96,7 @@ CREATE TABLE Tclasificadores_elo_jugadores (
   FOREIGN KEY (id_clasificador) REFERENCES Tclasificadores_elo(id_clasificador),
   FOREIGN KEY (id_jugador) REFERENCES Tjugadores(id_jugador)
 );
+select * from Tclasificadores_elo_jugadores;
 
 -- Tabla puntuaciones
 CREATE TABLE Tpuntuaciones (
@@ -103,6 +107,7 @@ CREATE TABLE Tpuntuaciones (
   partidos_empatados INT,
   FOREIGN KEY (id_equipo) REFERENCES Tequipos(id_equipo)
 );
+select * from Tpuntuaciones;
 
 -- INSERTANDO DATOS EN APERTURA-2020
 
@@ -741,3 +746,27 @@ WHERE ce.fecha_clasificador BETWEEN '2020-01-01' AND '2023-12-31';
 select * from Tpuntuaciones;
 
 insert into Tpuntuaciones values(1,1500,16,7,3);
+
+
+-- -------------------------------
+
+ALTER TABLE Tjugadores
+ADD COLUMN puntuacion_elo FLOAT;
+--
+
+CREATE TABLE Tclasificadores_elo_jugadores (
+  id_clasificador INT,
+  id_jugador INT,
+  fecha_clasificador DATE,
+  puntuacion_elo FLOAT,
+  FOREIGN KEY (id_clasificador) REFERENCES Tclasificadores_elo(id_clasificador),
+  FOREIGN KEY (id_jugador) REFERENCES Tjugadores(id_jugador)
+);
+
+alter table Tclasificadores_elo_jugadores
+add FOREIGN KEY (id_clasificador) REFERENCES Tclasificadores_elo(id_clasificador),
+add FOREIGN KEY (id_jugador) REFERENCES Tjugadores(id_jugador);
+
+select * from Tjugadores;
+select * from Tusuarios;
+

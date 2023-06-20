@@ -48,9 +48,12 @@ appServer <- function(id, session) {
 ui <- fluidPage(
   useShinyjs(),  # Cargar shinyjs
   tags$head(
+    tags$title("Modelo ELO"),  # Establecer el título de la pestaña 
     tags$style(
       HTML(
         "
+        
+        
         .sidebar-panel {
           background-color: #f8f9fa;
           padding: 15px;

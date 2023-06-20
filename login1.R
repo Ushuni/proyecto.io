@@ -4,6 +4,7 @@ library(shinyjs)
 
 # Definir la interfaz de usuario
 ui <- fluidPage(
+  tags$title("Inicio de Sesión"),  # Establecer el título de la pestaña
   useShinyjs(),  # Importante: utilizar shinyjs
   
   # Página de inicio de sesión
