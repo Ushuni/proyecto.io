@@ -6,7 +6,7 @@ library(plotly)
 library(magrittr)
 library(shiny)
 library(shinyjs)
-
+library(webshot)
 
 # Cerrar todas las conexiones a la base de datos
 conns <- dbListConnections(drv = RMySQL::MySQL())
@@ -28,6 +28,20 @@ calcular_expectativas <- function(puntuaciones_elo1, puntuaciones_elo2) {
 actualizar_puntuaciones_elo <- function(puntuaciones_elo, expectativa, resultado, factor_ajuste) {
   nueva_puntuacion_elo <- puntuaciones_elo + factor_ajuste * (resultado - expectativa)
   return(nueva_puntuacion_elo)
+}
+
+redirectToApp <- function() {
+  session$onSessionEnded(function() {
+    stopApp()  # Detener la aplicación actual
+    runApp("app.R")  # Iniciar la aplicación app.R
+  })
+}
+
+
+appServer <- function(id, session) {
+  moduleServer(id, function(input, output, session) {
+    # Lógica y funciones del módulo aquí
+  })
 }
 
 # Definir la interfaz de la aplicación
@@ -94,8 +108,8 @@ ui <- fluidPage(
                     choices = c("Ganó Equipo Local", "Empate", "Ganó Equipo Visitante")),
         actionButton("calcular", "Calcular", class = "btn-calcular"),
         actionButton("cerrar", "Cerrar", class = "btn-cerrar"),
-        actionButton("redireccionar", "Redireccionar", class = "btn-redireccionar")
-        
+        actionButton("redireccionar", "Redireccionar", class = "btn-redireccionar"),
+       
         
       )
     ),
@@ -140,6 +154,10 @@ server <- function(input, output, session) {
     puntuacion_elo_a(puntuacion_elo_a_val$puntuacion_elo)
     puntuacion_elo_b(puntuacion_elo_b_val$puntuacion_elo)
     
+   
+    
+    
+    
     # Calcular expectativas y nuevas puntuaciones Elo
     expectativa_a <- calcular_expectativas(puntuacion_elo_a(), puntuacion_elo_b())
     expectativa_b <- calcular_expectativas(puntuacion_elo_b(), puntuacion_elo_a())
@@ -153,8 +171,8 @@ server <- function(input, output, session) {
     equipo_visitante_id <- dbGetQuery(con, paste0("SELECT id_equipo FROM Tequipos WHERE nombre = '", equipo_b, "'"))
     
     # Actualizar las puntuaciones Elo en la base de datos
-   
-   
+    
+    
     
     dbExecute(con, paste0("UPDATE Tclasificadores_elo SET puntuacion_elo = ", nueva_puntuacion_elo_a,
                           " WHERE equipo_id = ", equipo_local_id$id_equipo))
@@ -173,8 +191,8 @@ server <- function(input, output, session) {
   })
   observeEvent(input$redireccionar, {
     runjs("window.location.href = 'C:\\Users\\Windows 10\\Desktop\\PROYECTO\\proyecto.io\\appPredic.R'")
-  
-  
+    
+    
     
   })
   # Mostrar la tabla de los resultados
@@ -232,12 +250,12 @@ server <- function(input, output, session) {
     p <- plot_ly(df, labels = df$Equipo, values = df$Puntuacion_Elo, type = "pie")
     p <- p %>% layout(title = "Puntuaciones Elo actualizadas")  # Cambio: Utilizar layout en lugar de add_layout
     p
+    
+    
+    
+  })
   
   
-  
-})
-  
-
   
   
   session$onSessionEnded(function() {

@@ -21,4 +21,3 @@ ggplot(datos, aes(x = Equipo, y = Puntuacion, fill = Equipo)) +
   geom_bar(stat = "identity") +
   labs(title = "Puntuaciones Elo de los equipos", x = "Equipo", y = "Puntuación Elo") +
   theme_minimal()
-
